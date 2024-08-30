@@ -167,9 +167,11 @@ class ChatCompletionClient : public HttpClient {
   // setup curl handle
   Error PreRunProcessing(
       CURL* curl, ChatCompletionRequest* request, const Headers& headers);
+  void HttpClient::PrintCurlCommand(
+      CURL* curl, ChatCompletionRequest* request, const Headers& headers)
 
-  static size_t ResponseHandler(
-      void* contents, size_t size, size_t nmemb, void* userp);
+      static size_t
+      ResponseHandler(void* contents, size_t size, size_t nmemb, void* userp);
   static size_t RequestProvider(
       void* contents, size_t size, size_t nmemb, void* userp);
   static size_t ResponseHeaderHandler(

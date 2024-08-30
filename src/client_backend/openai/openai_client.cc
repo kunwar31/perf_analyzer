@@ -215,6 +215,7 @@ ChatCompletionClient::PreRunProcessing(
 
   if (verbose_) {
     curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+    print_curl_command(curl, request, headers);
   }
 
   const long buffer_byte_size = 16 * 1024 * 1024;
@@ -253,6 +254,41 @@ ChatCompletionClient::PreRunProcessing(
   request->header_list_ = list;
 
   return Error::Success;
+}
+
+void
+ChatCompletionClient::PrintCurlCommand(
+    CURL* curl, ChatCompletionRequest* request, const Headers& headers)
+{
+  std::string curl_command = "curl -X POST";
+
+  curl_command += " \"" + url_ + "\"";
+
+  for (const auto& pr : headers) {
+    std::string hdr = pr.first + ": " + pr.second;
+    curl_command += " -H \"" + hdr + "\"";
+  }
+
+  const curl_off_t post_byte_size = request->total_input_byte_size_;
+  if (post_byte_size > 0) {
+    curl_command += " -d '";
+    curl_command += std::string(
+        reinterpret_cast<char*>(request->data_buffers_.front().first),
+        post_byte_size);
+    curl_command += "'";
+  }
+
+  if (!ssl_options_.ca_info.empty()) {
+    curl_command += " --cacert \"" + ssl_options_.ca_info + "\"";
+  }
+  if (!ssl_options_.cert.empty()) {
+    curl_command += " --cert \"" + ssl_options_.cert + "\"";
+  }
+  if (!ssl_options_.key.empty()) {
+    curl_command += " --key \"" + ssl_options_.key + "\"";
+  }
+
+  std::cout << "cURL Command: " << curl_command << std::endl;
 }
 
 Error

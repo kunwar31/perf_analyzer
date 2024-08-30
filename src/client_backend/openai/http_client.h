@@ -142,8 +142,9 @@ class HttpClient {
   // Note that this function does not block
   void Send(CURL* handle, std::unique_ptr<HttpRequest>&& request);
 
- protected:
-  void AsyncTransfer();
+  void HttpClient::PrintCurlCommandIfVerbose(CURL* handle)
+
+      protected : void AsyncTransfer();
 
   bool exiting_{false};
 
