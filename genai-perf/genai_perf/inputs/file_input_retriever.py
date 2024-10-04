@@ -44,9 +44,7 @@ class FileInputRetriever:
 
     # TODO: match return type to retriever interface
     def retrieve_data(self) -> Dict[str, Any]:
-        if self.config.output_format == OutputFormat.RANKINGS:
-            queries_filename = self.config.input_filename / "queries.jsonl"
-            passages_filename = self.config.input_filename / "passages.jsonl"
+        if self.config.input_filename.is_dir():
             return self._get_input_dataset_from_directory()
         else:
             return self._get_input_dataset_from_file(self.config.input_filename)
@@ -73,7 +71,8 @@ class FileInputRetriever:
 
         for jsonl_file in jsonl_files:
             dataset = self._get_input_dataset_from_file(jsonl_file)
-            file_key = jsonl_file.stem  # Filename without '.jsonl' extension
+            # Get filename without the extension
+            file_key = jsonl_file.stem
             datasets[file_key] = dataset
 
         return datasets
@@ -88,11 +87,12 @@ class FileInputRetriever:
         """
         self._verify_file(filename)
         prompts, images = self._get_prompts_from_input_file(filename)
-        if self.config.batch_size_image > len(images):
+        num_images, num_prompts = len(images), len(prompts)
+        if self.config.batch_size_image > num_images:
             raise ValueError(
                 "Batch size for images cannot be larger than the number of available images"
             )
-        if self.config.batch_size_text > len(prompts):
+        if self.config.batch_size_text > num_prompts:
             raise ValueError(
                 "Batch size for texts cannot be larger than the number of available texts"
             )
@@ -116,10 +116,10 @@ class FileInputRetriever:
             for _ in range(self.config.num_prompts):
                 content_array = []
                 sampled_image_indices = random.sample(
-                    range(len(prompts)), self.config.batch_size_image
+                    range(num_images), min(self.config.batch_size_image, num_images)
                 )
                 sampled_text_indices = random.sample(
-                    range(len(prompts)), self.config.batch_size_text
+                    range(num_prompts), min(self.config.batch_size_text, num_prompts)
                 )
 
                 sampled_images = [images[i] for i in sampled_image_indices]
