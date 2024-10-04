@@ -72,6 +72,7 @@ class InputsConfig:
     extra_inputs: Dict = field(default_factory=dict)
 
     # The filename where the input data is available
+    # TODO: Rename everywhere to be input_file_or_dir
     input_filename: Path = Path("")
 
     # The compression format of the images.

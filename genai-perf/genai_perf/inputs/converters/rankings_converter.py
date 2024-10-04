@@ -33,20 +33,44 @@ from genai_perf.inputs.inputs_config import InputsConfig
 class RankingsConverter(BaseConverter):
 
     def convert(self, generic_dataset: Dict, config: InputsConfig) -> Dict:
+        if "queries" not in generic_dataset or "passages" not in generic_dataset:
+            raise ValueError(
+                "Both 'queries.jsonl' and 'passages.jsonl' must be present in the input datasets."
+            )
+
+        passages_dataset = generic_dataset["passages"]
+        queries_dataset = generic_dataset["queries"]
         request_body: Dict[str, Any] = {"data": []}
 
-        for index, entry in enumerate(generic_dataset["rows"]):
-            model_name = self._select_model_name(config, index)
+        if not queries_dataset["rows"]:
+            raise ValueError("'queries.jsonl' must contain at least one entry.")
+        if not passages_dataset["rows"]:
+            raise ValueError("'passages.jsonl' must contain at least one entry.")
+
+        rows_of_passage_data = len(passages_dataset["rows"])
+        for query_index, query_entry in enumerate(queries_dataset["rows"]):
+            if query_index > rows_of_passage_data:
+                break
+
+            model_name = self._select_model_name(config, query_index)
+            query = query_entry["row"].get("text")
+
+            passage_entry = passages_dataset["rows"][query_index]
 
             if self._is_rankings_tei(config):
-                payload = {
-                    "query": entry["query"]["text"],
-                    "texts": [p["text"] for p in entry["passages"]],
-                }
+                passages = [
+                    p.get("text") for p in passage_entry if p.get("text") is not None
+                ]
+                payload = {"query": query, "texts": passages}
             else:
+                passages = [
+                    {"text": p.get("text")}
+                    for p in passage_entry
+                    if p.get("text") is not None
+                ]
                 payload = {
-                    "query": entry["query"],
-                    "passages": entry["passages"],
+                    "query": query,
+                    "passages": passages,
                     "model": model_name,
                 }
 
