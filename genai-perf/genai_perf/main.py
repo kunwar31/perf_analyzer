@@ -102,7 +102,9 @@ def create_config_options(args: Namespace) -> InputsConfig:
         random_seed=args.random_seed,
         num_prompts=args.num_prompts,
         add_stream=args.streaming,
-        tokenizer=get_tokenizer(args.tokenizer),
+        tokenizer=get_tokenizer(
+            args.tokenizer, args.tokenizer_trust_remote_code, args.tokenizer_revision
+        ),
         extra_inputs=extra_input_dict,
         batch_size=args.batch_size,
         output_dir=args.artifact_dir,
@@ -192,23 +194,24 @@ def create_plots(args: Namespace) -> None:
 # Separate function that can raise exceptions used for testing
 # to assert correct errors and messages.
 def run():
-    try:
-        # TMA-1900: refactor CLI handler
-        logging.init_logging()
-        args, extra_args = parser.parse_args()
-        config_options = create_config_options(args)
-        if args.subcommand == "compare":
-            args.func(args)
-        else:
-            create_artifacts_dirs(args)
-            tokenizer = get_tokenizer(args.tokenizer)
-            generate_inputs(config_options)
-            telemetry_data_collector = create_telemetry_data_collector(args)
-            args.func(args, extra_args, telemetry_data_collector)
-            data_parser = calculate_metrics(args, tokenizer)
-            report_output(data_parser, telemetry_data_collector, args)
-    except Exception as e:
-        raise GenAIPerfException(e)
+    # TMA-1900: refactor CLI handler
+    logging.init_logging()
+    args, extra_args = parser.parse_args()
+    config_options = create_config_options(args)
+    if args.subcommand == "compare":
+        args.func(args)
+    else:
+        create_artifacts_dirs(args)
+        tokenizer = get_tokenizer(
+            args.tokenizer,
+            args.tokenizer_trust_remote_code,
+            args.tokenizer_revision,
+        )
+        generate_inputs(config_options)
+        telemetry_data_collector = create_telemetry_data_collector(args)
+        args.func(args, extra_args, telemetry_data_collector)
+        data_parser = calculate_metrics(args, tokenizer)
+        report_output(data_parser, telemetry_data_collector, args)
 
 
 def main():
