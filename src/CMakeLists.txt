@@ -63,6 +63,7 @@ if(LINUX)
   file(STRINGS "/etc/os-release" DISTRO_ID_LIKE REGEX "ID_LIKE")
   if(${DISTRO_ID_LIKE} MATCHES "rhel|centos")
     set(TRITON_RHEL_BUILD ON)
+    set_property(GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS TRUE)
   endif(${DISTRO_ID_LIKE} MATCHES "rhel|centos")
 endif(LINUX)
 
