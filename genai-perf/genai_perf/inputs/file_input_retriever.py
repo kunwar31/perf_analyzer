@@ -109,6 +109,8 @@ class FileInputRetriever:
                 content = {}
                 if prompt is not None:
                     content["text_input"] = prompt
+                    print("content[text_input]", content["text_input"])
+                    print("type(content)", type(content))
                 if image is not None:
                     content["image"] = image
                 dataset_json["rows"].append({"row": content})

@@ -47,26 +47,34 @@ class RankingsConverter(BaseConverter):
         if not passages_dataset["rows"]:
             raise ValueError("'passages.jsonl' must contain at least one entry.")
 
+        print("queries_dataset", queries_dataset)
+        print("passages_dataset", passages_dataset)
         rows_of_passage_data = len(passages_dataset["rows"])
         for query_index, query_entry in enumerate(queries_dataset["rows"]):
             if query_index > rows_of_passage_data:
                 break
 
             model_name = self._select_model_name(config, query_index)
-            query = query_entry["row"].get("text")
+            print("type(query_entry)", type(query_entry))
+            print("query_entry", query_entry)
+            print("type(query_entry(row))", type(query_entry["text_input"]))
+            print("query_entry(text_input)", query_entry["text_input"])
+            query = query_entry["text_input"]
 
             passage_entry = passages_dataset["rows"][query_index]
 
             if self._is_rankings_tei(config):
                 passages = [
-                    p.get("text") for p in passage_entry if p.get("text") is not None
+                    p.get("text_input")
+                    for p in passage_entry
+                    if p.get("text_input") is not None
                 ]
                 payload = {"query": query, "texts": passages}
             else:
                 passages = [
-                    {"text": p.get("text")}
+                    {"text_input": p.get("text_input")}
                     for p in passage_entry
-                    if p.get("text") is not None
+                    if p.get("text_input") is not None
                 ]
                 payload = {
                     "query": query,

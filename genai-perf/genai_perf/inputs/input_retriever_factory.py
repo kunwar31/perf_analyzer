@@ -150,10 +150,27 @@ class InputRetrieverFactory:
     def _convert_dataset_to_generic_input_json(
         self, dataset_json: Dict
     ) -> Dict[str, List[Dict]]:
-        generic_input_json = self._add_features_to_generic_json({}, dataset_json)
-        generic_input_json = self._add_rows_to_generic_json(
-            generic_input_json, dataset_json
-        )
+        is_single_file = "rows" in dataset_json
+        print("is_single_file", is_single_file)
+        generic_input_json: Dict = {}
+        if is_single_file:
+            generic_input_json = self._add_features_to_generic_json(
+                generic_input_json, dataset_json
+            )
+            generic_input_json = self._add_rows_to_generic_json(
+                generic_input_json, dataset_json
+            )
+        else:
+            print("dataset_json", dataset_json)
+            for file in dataset_json:
+                print("file", file)
+                print("dataset_json[file]", dataset_json[file])
+                generic_input_json[file] = self._add_features_to_generic_json(
+                    generic_input_json, dataset_json[file]
+                )
+                generic_input_json[file] = self._add_rows_to_generic_json(
+                    generic_input_json[file], dataset_json[file]
+                )
 
         return generic_input_json
 
@@ -171,7 +188,10 @@ class InputRetrieverFactory:
         self, generic_input_json: Dict, dataset_json: Dict
     ) -> Dict[str, List[Dict]]:
         generic_input_json["rows"] = []
+        print("*dataset_json*", dataset_json)
         for row in dataset_json["rows"]:
+            print("row", type(row["row"].get("text_input")))
+            print("type(row)", type(row["text_input"]))
             generic_input_json["rows"].append(row["row"])
 
         return generic_input_json

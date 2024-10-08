@@ -33,16 +33,18 @@ class TestRankingsConverter:
 
     def test_convert_default(self):
         generic_dataset = {
-            "rows": [
-                {
-                    "query": {"text": "query 1"},
-                    "passages": [{"text": "passage 1"}, {"text": "passage 2"}],
-                },
-                {
-                    "query": {"text": "query 2"},
-                    "passages": [{"text": "passage 3"}, {"text": "passage 4"}],
-                },
-            ]
+            "queries": {
+                "rows": [
+                    {"row": {"text": "query 1"}},
+                    {"row": {"text": "query 2"}},
+                ]
+            },
+            "passages": {
+                "rows": [
+                    [{"text": "passage 1"}, {"text": "passage 2"}],
+                    [{"text": "passage 3"}, {"text": "passage 4"}],
+                ]
+            },
         }
 
         config = InputsConfig(
@@ -82,16 +84,18 @@ class TestRankingsConverter:
 
     def test_convert_with_request_parameters(self):
         generic_dataset = {
-            "rows": [
-                {
-                    "query": {"text": "query 1"},
-                    "passages": [{"text": "passage 1"}, {"text": "passage 2"}],
-                },
-                {
-                    "query": {"text": "query 2"},
-                    "passages": [{"text": "passage 3"}, {"text": "passage 4"}],
-                },
-            ]
+            "queries": {
+                "rows": [
+                    {"row": {"text": "query 1"}},
+                    {"row": {"text": "query 2"}},
+                ]
+            },
+            "passages": {
+                "rows": [
+                    [{"text": "passage 1"}, {"text": "passage 2"}],
+                    [{"text": "passage 3"}, {"text": "passage 4"}],
+                ]
+            },
         }
 
         extra_inputs = {
@@ -143,16 +147,18 @@ class TestRankingsConverter:
 
     def test_convert_huggingface_tei(self):
         generic_dataset = {
-            "rows": [
-                {
-                    "query": {"text": "query 1"},
-                    "passages": [{"text": "passage 1"}, {"text": "passage 2"}],
-                },
-                {
-                    "query": {"text": "query 2"},
-                    "passages": [{"text": "passage 3"}, {"text": "passage 4"}],
-                },
-            ]
+            "queries": {
+                "rows": [
+                    {"row": {"text": "query 1"}},
+                    {"row": {"text": "query 2"}},
+                ]
+            },
+            "passages": {
+                "rows": [
+                    [{"text": "passage 1"}, {"text": "passage 2"}],
+                    [{"text": "passage 3"}, {"text": "passage 4"}],
+                ]
+            },
         }
 
         extra_inputs = {
