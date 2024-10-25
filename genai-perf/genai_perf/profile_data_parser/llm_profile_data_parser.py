@@ -204,14 +204,16 @@ class LLMProfileDataParser(ProfileDataParser):
                 responses = response.strip().split("\n\n")
                 if len(responses) > 1:
                     merged_response = load_json_str(remove_sse_prefix(responses[0]))
+                    if "delta" not in merged_response["choices"][0]:
+                        merged_response["choices"][0]["delta"] = {}
                     if (
-                        merged_response["choices"][0].get("delta", {}).get("content", None)
+                        merged_response["choices"][0]["delta"].get("content", None)
                         is None
                     ):
-                        merged_response["choices"][0].get("delta", {})["content"] = ""
+                        merged_response["choices"][0]["delta"]["content"] = ""
                     for r in responses[1:]:
                         text = self._extract_openai_text_output(r)
-                        merged_response["choices"][0].get("delta", {})["content"] += text
+                        merged_response["choices"][0]["delta"]["content"] += text
 
                     res_outputs[i] = {"response": json.dumps(merged_response)}
 
