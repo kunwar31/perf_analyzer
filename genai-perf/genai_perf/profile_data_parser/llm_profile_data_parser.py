@@ -328,7 +328,7 @@ class LLMProfileDataParser(ProfileDataParser):
         elif data["object"] == "chat.completion":  # non-streaming
             text_output = completions["message"].get("content", "")
         elif data["object"] == "chat.completion.chunk":  # streaming
-            text_output = completions["delta"].get("content", "")
+            text_output = completions.get("delta", {}).get("content", "")
         else:
             obj_type = data["object"]
             raise ValueError(f"Unknown OpenAI response object type '{obj_type}'.")
